@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResultCraft | Premium Academic Metrics Dashboard</title>
+  
+  <!-- SEO & Meta Tags -->
+  <meta name="description" content="Calculate and visualize academic grades, GPA, and subject breakdown performance in a premium, interactive glassmorphic dashboard.">
+  <meta name="theme-color" content="#0f172a">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ----------------------------------------------------
+       1. GLOBAL RESET & CSS CONSTANTS
+       ---------------------------------------------------- */
+    :root {
+      /* Dark Theme (Default) */
+      --bg-gradient: linear-gradient(135deg, #070913 0%, #0c1220 50%, #15102a 100%);
+      --card-bg: rgba(15, 23, 42, 0.55);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-glow: rgba(99, 102, 241, 0.12);
+      
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-accent: rgba(255, 255, 255, 0.05);
+      
+      /* Accent Gradients & Colors */
+      --primary: #8b5cf6;
+      --primary-glow: rgba(139, 92, 246, 0.25);
+      --primary-grad: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+      
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.2);
+      --success-grad: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      
+      --danger: #f43f5e;
+      --danger-glow: rgba(244, 63, 94, 0.2);
+      --danger-grad: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+      
+      --warning: #f59e0b;
+      --warning-glow: rgba(245, 158, 11, 0.2);
+      --warning-grad: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      
+      --info: #0ea5e9;
+      --info-grad: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      
+      --transition-normal: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Light Theme Settings */
+    body.light-theme {
+      --bg-gradient: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 50%, #dbeafe 100%);
+      --card-bg: rgba(255, 255, 255, 0.72);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --card-glow: rgba(99, 102, 241, 0.06);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-accent: rgba(0, 0, 0, 0.03);
+      --shadow-premium: 0 20px 40px rgba(31, 41, 55, 0.06);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 90px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background var(--transition-normal), color var(--transition-normal);
+    }
+
+    h1, h2, h3, h4, .brand-title {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* Confetti Canvas Overlay */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ----------------------------------------------------
+       2. REUSABLE PREMIUM UI COMPONENTS & ANIMATIONS
+       ---------------------------------------------------- */
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-premium), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      transition: box-shadow var(--transition-normal), border var(--transition-normal), transform var(--transition-normal);
+    }
+
+    body.light-theme .glass-card {
+      box-shadow: var(--shadow-premium), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .btn-primary {
+      background: var(--primary-grad);
+      color: #fff;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.85rem 1.75rem;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px var(--primary-glow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all var(--transition-fast);
+      text-decoration: none;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px var(--primary-glow);
+      filter: brightness(1.05);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.85rem 1.75rem;
+      border-radius: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all var(--transition-fast);
+      text-decoration: none;
+    }
+
+    body.light-theme .btn-secondary {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    body.light-theme .btn-secondary:hover {
+      background: rgba(0, 0, 0, 0.06);
+      border-color: rgba(0, 0, 0, 0.15);
+    }
+
+    .glow-text {
+      background: linear-gradient(135deg, #a78bfa 0%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    body.light-theme .glow-text {
+      background: linear-gradient(135deg, #6d28d9 0%, #4338ca 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 15px var(--card-glow); }
+      50% { box-shadow: 0 0 25px rgba(139, 92, 246, 0.25); }
+    }
+
+    /* ----------------------------------------------------
+       3. NAVIGATION BAR
+       ---------------------------------------------------- */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(7, 9, 19, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--card-border);
+      transition: background var(--transition-normal);
+    }
+
+    body.light-theme header {
+      background: rgba(243, 244, 246, 0.75);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-logo {
+      background: var(--primary-grad);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.15rem;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    .brand-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color var(--transition-fast);
+    }
+
+    .nav-link:hover {
+      color: var(--text-main);
+    }
+
+    .theme-toggle-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    body.light-theme .theme-toggle-btn {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .theme-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--primary);
+      transform: scale(1.05);
+    }
+
+    body.light-theme .theme-toggle-btn:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .theme-toggle-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .theme-toggle-btn .sun-icon {
+      display: none;
+    }
+
+    body.light-theme .theme-toggle-btn .moon-icon {
+      display: none;
+    }
+
+    body.light-theme .theme-toggle-btn .sun-icon {
+      display: block;
+    }
+
+    /* ----------------------------------------------------
+       4. HERO & LANDING SECTION
+       ---------------------------------------------------- */
+    .landing-section {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 4rem 1.5rem 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 5rem;
+      scroll-margin-top: 90px;
+    }
+
+    .hero-container {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    @media (max-width: 992px) {
+      .hero-container {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        text-align: center;
+      }
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 992px) {
+      .hero-content {
+        align-items: center;
+      }
+    }
+
+    .hero-tag {
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      color: #a78bfa;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.35rem 0.85rem;
+      border-radius: 99px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    body.light-theme .hero-tag {
+      color: #6d28d9;
+      background: rgba(139, 92, 246, 0.08);
+    }
+
+    .hero-title {
+      font-size: 3.25rem;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+
+    @media (max-width: 640px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+    }
+
+    .hero-desc {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Mockup Dashboard Graphics Panel */
+    .hero-mockup-wrapper {
+      position: relative;
+      animation: float 5s ease-in-out infinite;
+    }
+
+    .mockup-card {
+      padding: 2rem;
+      width: 100%;
+      border-radius: 28px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.08);
+      position: relative;
+    }
+
+    body.light-theme .mockup-card {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(0, 0, 0, 0.08);
+      box-shadow: 0 30px 60px rgba(31, 41, 55, 0.08);
+    }
+
+    /* Grid Mockup Layout */
+    .mockup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .mockup-dot-group {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .mockup-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    body.light-theme .mockup-dot {
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .mockup-dot:nth-child(1) { background: #ef4444; }
+    .mockup-dot:nth-child(2) { background: #f59e0b; }
+    .mockup-dot:nth-child(3) { background: #10b981; }
+
+    .mockup-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+
+    .mockup-summary {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .mockup-gauge {
+      width: 90px;
+      height: 90px;
+      position: relative;
+    }
+
+    .mockup-gauge svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .mockup-gauge-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.06);
+      stroke-width: 8;
+    }
+    
+    body.light-theme .mockup-gauge-bg {
+      stroke: rgba(0, 0, 0, 0.06);
+    }
+
+    .mockup-gauge-fill {
+      fill: none;
+      stroke: var(--success);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 251.2; /* r=40 */
+      stroke-dashoffset: 15; /* 94% filled */
+    }
+
+    .mockup-gauge-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .mockup-badges {
+      flex: 1;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .mockup-badge {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 0.6rem 0.85rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    body.light-theme .mockup-badge {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.04);
+    }
+
+    .mockup-badge-val {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .mockup-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 0.85rem;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    body.light-theme .mockup-status {
+      color: #065f46;
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    .mockup-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .mockup-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .mockup-bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 99px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    body.light-theme .mockup-bar {
+      background: rgba(0,0,0,0.06);
+    }
+
+    .mockup-fill {
+      height: 100%;
+      border-radius: 99px;
+    }
+
+    /* Decorative Back Glow */
+    .hero-mockup-wrapper::before {
+      content: '';
+      position: absolute;
+      width: 80%;
+      height: 80%;
+      top: 10%;
+      left: 10%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.1) 70%);
+      filter: blur(50px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* ----------------------------------------------------
+       5. FEATURES GRID & INFO PANELS
+       ---------------------------------------------------- */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .feature-card {
+      padding: 2.25rem;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3), 0 0 20px var(--card-glow);
+      border-color: rgba(139, 92, 246, 0.25);
+    }
+
+    .feature-icon {
+      background: var(--primary-glow);
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #a78bfa;
+    }
+
+    body.light-theme .feature-icon {
+      color: #6d28d9;
+    }
+
+    .feature-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .feature-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* Onboarding criteria guidelines container */
+    .criteria-section {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      scroll-margin-top: 90px;
+    }
+
+    .criteria-panel {
+      padding: 3rem;
+    }
+
+    @media (max-width: 640px) {
+      .criteria-panel {
+        padding: 1.5rem;
+      }
+    }
+
+    .criteria-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .criteria-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .criteria-subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .criteria-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .criteria-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    .criteria-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-accent);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    body.light-theme .criteria-box {
+      background: rgba(0, 0, 0, 0.01);
+    }
+
+    .criteria-box h4 {
+      font-size: 1.05rem;
+      margin-bottom: 1rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .criteria-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .criteria-item {
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed var(--border-accent);
+    }
+
+    .criteria-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .criteria-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .badge-pass {
+      background: var(--success-glow);
+      color: #34d399;
+    }
+
+    body.light-theme .badge-pass {
+      color: #047857;
+    }
+
+    .badge-fail {
+      background: var(--danger-glow);
+      color: #f43f5e;
+    }
+
+    body.light-theme .badge-fail {
+      color: #be123c;
+    }
+
+    /* ----------------------------------------------------
+       6. APPLICATION WORKSPACE
+       ---------------------------------------------------- */
+    .app-section {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 4rem 1.5rem 6rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      scroll-margin-top: 90px;
+    }
+
+    .section-title-wrap {
+      text-align: center;
+    }
+
+    .section-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .app-workspace-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 2.5rem;
+      align-items: stretch;
+    }
+
+    @media (max-width: 992px) {
+      .app-workspace-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+
+    /* Panel Card Structure */
+    .panel-card {
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-card:hover {
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35), 0 0 25px var(--card-glow);
+    }
+
+    .panel-title {
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .panel-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    /* Forms & Subject Entry */
+    .subject-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 1.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-accent);
+      padding: 0.85rem 1.25rem;
+      border-radius: 16px;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+
+    body.light-theme .input-row {
+      background: rgba(0, 0, 0, 0.01);
+    }
+
+    .input-row:focus-within {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: var(--primary);
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.08);
+    }
+
+    body.light-theme .input-row:focus-within {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .subject-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 170px;
+    }
+
+    .subject-icon {
+      background: rgba(255, 255, 255, 0.04);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: all var(--transition-fast);
+    }
+
+    body.light-theme .subject-icon {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .input-row:focus-within .subject-icon {
+      color: var(--primary);
+      background: var(--primary-glow);
+    }
+
+    .subject-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .subject-label {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .field-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .marks-input {
+      width: 100%;
+      background: transparent;
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 0.65rem 2.5rem 0.65rem 0.85rem;
+      font-family: inherit;
+      color: var(--text-main);
+      font-size: 1.05rem;
+      font-weight: 600;
+      transition: all var(--transition-fast);
+      outline: none;
+    }
+
+    body.light-theme .marks-input {
+      border-color: rgba(0, 0, 0, 0.15);
+    }
+
+    .marks-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .marks-input::-webkit-outer-spin-button,
+    .marks-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .marks-input[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    .indicator-icon {
+      position: absolute;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      opacity: 0;
+      transform: scale(0.7);
+      transition: all var(--transition-fast);
+    }
+
+    /* Valid & Invalid Row Styles */
+    .input-row.is-valid .marks-input {
+      border-color: var(--success);
+      box-shadow: 0 0 0 3px var(--success-glow);
+    }
+
+    .input-row.is-valid .indicator-icon {
+      opacity: 1;
+      transform: scale(1);
+      color: var(--success);
+    }
+
+    .input-row.is-invalid .marks-input {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px var(--danger-glow);
+    }
+
+    .input-row.is-invalid .indicator-icon {
+      opacity: 1;
+      transform: scale(1);
+      color: var(--danger);
+    }
+
+    .error-tooltip {
+      position: absolute;
+      bottom: -16px;
+      right: 1.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #fb7185;
+      opacity: 0;
+      transform: translateY(-2px);
+      transition: all var(--transition-fast);
+      pointer-events: none;
+    }
+
+    body.light-theme .error-tooltip {
+      color: #e11d48;
+    }
+
+    .input-row.is-invalid .error-tooltip {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Calculate Button */
+    .calculate-btn {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 16px;
+    }
+
+    .calculate-btn:disabled {
+      background: var(--text-muted);
+      opacity: 0.3;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none !important;
+    }
+
+    .calculate-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      transition: transform var(--transition-fast);
+    }
+
+    .calculate-btn:hover:not(:disabled) svg {
+      transform: translateX(4px);
+    }
+
+    /* ----------------------------------------------------
+       7. RESULTS DASHBOARD PANELS
+       ---------------------------------------------------- */
+    /* Placeholder State */
+    .result-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100%;
+      min-height: 420px;
+      color: var(--text-muted);
+      animation: fadeIn var(--transition-normal) forwards;
+    }
+
+    .placeholder-illustration {
+      width: 140px;
+      height: 140px;
+      margin-bottom: 2rem;
+      color: rgba(139, 92, 246, 0.2);
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .placeholder-text {
+      font-size: 1.05rem;
+      line-height: 1.5;
+      max-width: 280px;
+    }
+
+    /* Results Workspace (Calculated state) */
+    .result-dashboard {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      animation: slideUp var(--transition-normal) forwards;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .result-summary-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2rem;
+      align-items: center;
+      margin-bottom: 2.25rem;
+    }
+
+    @media (max-width: 480px) {
+      .result-summary-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+        justify-items: center;
+      }
+    }
+
+    /* SVG Radial Percent Gauge */
+    .percentage-gauge {
+      width: 140px;
+      height: 140px;
+      position: relative;
+    }
+
+    .percentage-gauge svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .gauge-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.05);
+      stroke-width: 10;
+    }
+
+    body.light-theme .gauge-bg {
+      stroke: rgba(0, 0, 0, 0.05);
+    }
+
+    .gauge-fill {
+      fill: none;
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-dasharray: 377; /* 2 * PI * 60 */
+      stroke-dashoffset: 377;
+      transition: stroke-dashoffset 1.5s cubic-bezier(0.1, 0.8, 0.25, 1);
+    }
+
+    .gauge-info {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .percentage-val {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .percentage-lbl {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    /* Scoring cards group */
+    .summary-badges {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      width: 100%;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 0.85rem;
+    }
+
+    .score-badge {
+      flex: 1;
+      padding: 0.85rem 1.15rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-accent);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    body.light-theme .score-badge {
+      background: rgba(0, 0, 0, 0.01);
+    }
+
+    .badge-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .badge-value {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .badge-value.grade-color {
+      color: var(--grade-color);
+      text-shadow: 0 0 12px var(--grade-glow);
+    }
+
+    /* Status Banner Alert */
+    .status-banner {
+      border-radius: 16px;
+      padding: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      border: 1px solid transparent;
+      animation: fadeIn var(--transition-normal) forwards;
+    }
+
+    .status-banner.status-pass {
+      background: var(--success-glow);
+      border-color: rgba(16, 185, 129, 0.25);
+      color: #6ee7b7;
+    }
+
+    body.light-theme .status-banner.status-pass {
+      color: #065f46;
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .status-banner.status-fail {
+      background: var(--danger-glow);
+      border-color: rgba(244, 63, 94, 0.25);
+      color: #fda4af;
+    }
+
+    body.light-theme .status-banner.status-fail {
+      color: #9f1239;
+      background: rgba(244, 63, 94, 0.08);
+    }
+
+    .status-banner-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .status-banner-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.5;
+    }
+
+    /* Breakdown Bar Charts */
+    .subject-breakdown {
+      margin-bottom: 2.25rem;
+    }
+
+    .breakdown-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .breakdown-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .breakdown-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .breakdown-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .breakdown-subject-name {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .breakdown-subject-name svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      opacity: 0.7;
+    }
+
+    .breakdown-marks {
+      font-weight: 700;
+    }
+
+    .breakdown-status {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 6px;
+      margin-left: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .breakdown-status.pass {
+      background: var(--success-glow);
+      color: #34d399;
+    }
+
+    body.light-theme .breakdown-status.pass {
+      color: #047857;
+    }
+
+    .breakdown-status.fail {
+      background: var(--danger-glow);
+      color: #f43f5e;
+    }
+
+    body.light-theme .breakdown-status.fail {
+      color: #be123c;
+    }
+
+    .bar-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    body.light-theme .bar-track {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 99px;
+      transition: width 1.25s cubic-bezier(0.1, 0.8, 0.25, 1);
+    }
+
+    /* Reset button */
+    .reset-btn {
+      width: 100%;
+      padding: 0.85rem;
+    }
+
+    .reset-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.25;
+      transition: transform var(--transition-normal);
+    }
+
+    .reset-btn:hover svg {
+      transform: rotate(-180deg);
+    }
+
+    /* ----------------------------------------------------
+       8. FOOTER
+       ---------------------------------------------------- */
+    footer {
+      margin-top: auto;
+      border-top: 1px solid var(--border-accent);
+      background: rgba(7, 9, 19, 0.4);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      transition: background var(--transition-normal);
+    }
+
+    body.light-theme footer {
+      background: rgba(0, 0, 0, 0.02);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Confetti particle overlay canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Navigation Bar -->
+  <header>
+    <div class="nav-container">
+      <a href="#" class="brand">
+        <div class="brand-logo" aria-hidden="true">%</div>
+        <div class="brand-title">ResultCraft</div>
+      </a>
+      <nav class="nav-menu">
+        <a href="#landing-section" class="nav-link">Home</a>
+        <a href="#criteria-section" class="nav-link">Criteria</a>
+        <a href="#app-section" class="nav-link">Calculator</a>
+        <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle visual theme">
+          <!-- Moon icon for light mode toggle -->
+          <svg class="moon-icon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <!-- Sun icon for dark mode toggle -->
+          <svg class="sun-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Landing & Hero Fold -->
+  <section class="landing-section" id="landing-section">
+    <div class="hero-container">
+      
+      <div class="hero-content">
+        <div class="hero-tag">Interactive Analytics</div>
+        <h1 class="hero-title">Academic Metrics, <span class="glow-text">Crafted Visually.</span></h1>
+        <p class="hero-desc">
+          Evaluate student scores instantly. ResultCraft compiles visual metrics, builds horizontal performance trackers, maps letter grades, and validates data inputs in real-time.
+        </p>
+        <div class="hero-buttons">
+          <a href="#app-section" class="btn-primary" id="hero-get-started">
+            Get Started
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <a href="#criteria-section" class="btn-secondary">Criteria</a>
+        </div>
+      </div>
+
+      <!-- Mockup Display Card representing calculated state -->
+      <div class="hero-mockup-wrapper">
+        <div class="mockup-card">
+          <div class="mockup-header">
+            <div class="mockup-dot-group">
+              <div class="mockup-dot"></div>
+              <div class="mockup-dot"></div>
+              <div class="mockup-dot"></div>
+            </div>
+            <div class="mockup-label">Live Preview</div>
+          </div>
+          
+          <div class="mockup-summary">
+            <div class="mockup-gauge">
+              <svg>
+                <circle class="mockup-gauge-bg" cx="45" cy="45" r="40"></circle>
+                <circle class="mockup-gauge-fill" cx="45" cy="45" r="40"></circle>
+              </svg>
+              <div class="mockup-gauge-text">94%</div>
+            </div>
+            
+            <div class="mockup-badges">
+              <div class="mockup-badge">
+                <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Total</span>
+                <span class="mockup-badge-val">470/500</span>
+              </div>
+              <div class="mockup-badge">
+                <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Grade</span>
+                <span class="mockup-badge-val" style="color: var(--success);">A</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mockup-status">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <span>Pass Status Achieved</span>
+          </div>
+
+          <!-- Subject rows mockup -->
+          <div class="mockup-row">
+            <div class="mockup-meta"><span>JAVA</span><span>96%</span></div>
+            <div class="mockup-bar"><div class="mockup-fill" style="width: 96%; background: var(--success-grad);"></div></div>
+          </div>
+          <div class="mockup-row">
+            <div class="mockup-meta"><span>System Design</span><span>99%</span></div>
+            <div class="mockup-bar"><div class="mockup-fill" style="width: 99%; background: var(--success-grad);"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Feature Advantages Columns -->
+    <div class="features-grid">
+      <div class="glass-card feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        </div>
+        <h3 class="feature-title">Real-Time Metrics</h3>
+        <p class="feature-desc">Visual percentage gauges and horizontal bar charts update instantly when results compile, giving graphical academic outlines.</p>
+      </div>
+
+      <div class="glass-card feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        </div>
+        <h3 class="feature-title">Precision Validation</h3>
+        <p class="feature-desc">Interactive inputs validate bounds and numbers on-the-fly, displaying indicators and tools to prevent input entry mistakes.</p>
+      </div>
+
+      <div class="glass-card feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect><path d="M12 2v20"></path></svg>
+        </div>
+        <h3 class="feature-title">Harmonious Themes</h3>
+        <p class="feature-desc">Adaptive Dark and Light modes constructed using custom color variables respect and save user layout preferences.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Grading Criteria Rules Onboarding -->
+  <section class="criteria-section" id="criteria-section">
+    <div class="glass-card criteria-panel">
+      <div class="criteria-header">
+        <h2 class="criteria-title">Assessment Guidelines</h2>
+        <p class="criteria-subtitle">Understanding the requirements for pass status and grade scales.</p>
+      </div>
+      
+      <div class="criteria-grid">
+        <div class="criteria-box">
+          <h4>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary);"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            Passing Parameters
+          </h4>
+          <ul class="criteria-list">
+            <li class="criteria-item">
+              <span>Subject Level Minimum</span>
+              <span class="criteria-badge badge-pass">&ge; 35 Marks</span>
+            </li>
+            <li class="criteria-item">
+              <span>Overall Score Minimum</span>
+              <span class="criteria-badge badge-pass">&ge; 40% Average</span>
+            </li>
+            <li class="criteria-item">
+              <span>Failure Condition</span>
+              <span class="criteria-badge badge-fail">Any Subject &lt; 35</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="criteria-box">
+          <h4>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            Grade Score Scales
+          </h4>
+          <ul class="criteria-list">
+            <li class="criteria-item"><span>Grade A (Excellent Performance)</span><strong>&ge; 90%</strong></li>
+            <li class="criteria-item"><span>Grade B (Good standing)</span><strong>80% &ndash; 89%</strong></li>
+            <li class="criteria-item"><span>Grade C (Satisfactory)</span><strong>70% &ndash; 79%</strong></li>
+            <li class="criteria-item"><span>Grade D (Passing Grade)</span><strong>60% &ndash; 69%</strong></li>
+            <li class="criteria-item"><span>Grade F (Failing Grade)</span><strong>&lt; 60%</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Workspace Studio -->
+  <section class="app-section" id="app-section">
+    <div class="section-title-wrap">
+      <h2 class="section-title">Academic Analytics Studio</h2>
+      <p class="section-subtitle">Enter student credentials and subject metrics to execute evaluations.</p>
+    </div>
+
+    <div class="app-workspace-grid">
+      
+      <!-- Subject Inputs Panel -->
+      <div class="glass-card panel-card" id="input-panel">
+        <h3 class="panel-title">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary);"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"></path></svg>
+          Scores Entry
+        </h3>
+        <p class="panel-subtitle">Provide scores ranging between 0 and 100 for each subject parameters.</p>
+        
+        <form id="marks-form" novalidate>
+          <div class="subject-inputs">
+            
+            <!-- DBMS Input -->
+            <div class="input-row" id="row-sub1">
+              <div class="subject-info">
+                <div class="subject-icon">
+                  <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>
+                </div>
+                <span class="subject-label">DBMS</span>
+              </div>
+              <div class="field-wrapper">
+                <input type="number" class="marks-input" id="sub1" min="0" max="100" placeholder="0 - 100" required>
+                <div class="indicator-icon">
+                  <svg class="check-svg" viewBox="0 0 24 24" style="display:none; width: 100%; height: 100%;"><polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+                  <svg class="x-svg" viewBox="0 0 24 24" style="display:none; width: 100%; height: 100%;"><line x1="18" y1="6" x2="6" y2="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></line><line x1="6" y1="6" x2="18" y2="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></line></svg>
+                </div>
+                <span class="error-tooltip">Invalid marks (0-100)</span>
+              </div>
+            </div>
+
+            <!-- JAVA Input -->
+            <div class="input-row" id="row-sub2">
+              <div class="subject-info">
+                <div class="subject-icon">
+                  <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                </div>
+                <span class="subject-label">JAVA</span>
+              </div>
+              <div class="field-wrapper">
+                <input type="number" class="marks-input" id="sub2" min="0" max="100" placeholder="0 - 100" required>
+                <div class="indicator-icon">
+                  <svg class="check-svg" viewBox="0 0 24 24" style="display:none; width: 100%; height: 100%;"><polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+                  <svg class="x-svg" viewBox="0 0 24 24" style="display:none; width: 100%; height: 100%;"><line x1="18" y1="6" x2="6" y2="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></line><line x1="6" y1="6" x2="18" y2="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></line></svg>
+                </div>
+                <span class="error-tooltip">Invalid marks (0-100)</span>
+              </div>
+            </div>
+
+            <!-- Operating System Input -->
+            <div class="input-row" id="row-sub3">
+              <div class="subject-info">
+                <div class="subject-icon">
+                  <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
+                </div>
+                <span class="subject-label">Operating Sys</span>
+              </div>
+              <div class="field-wrapper">
+                <input type="number" class="marks-input" id="sub3" min="0" max="100" placeholder="0 - 100" required>
+                <div class="indicator-icon">
+                  <svg class="check-svg" viewBox="0 0 24 24" style="display:none; width: 100%; height: 100%;"><polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+                  <svg class="x-svg" viewBox="0 0 24 24" style="display:none; width: 100%; height: 100%;"><line x1="18" y1="6" x2="6" y2="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></line><line x1="6" y1="6" x2="18" y2="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></line></svg>
+                </div>
+                <span class="error-tooltip">Invalid marks (0-100)</span>
+              </div>
+            </div>
+
+            <!-- Computer Networks Input -->
+            <div class="input-row" id="row-sub4">
+              <div class="subject-info">
+                <div class="subject-icon">
+                  <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                </div>
+                <span class="subject-label">Networks</span>
+              </div>
+              <div class="field-wrapper">
+                <input type="number" class="marks-input" id="sub4" min="0" max="100" placeholder="0 - 100" required>
+                <div class="indicator-icon">
+                  <svg class="check-svg" viewBox="0 0 24 24" style="display:none; width: 100%; height: 100%;"><polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+                  <svg class="x-svg" viewBox="0 0 24 24" style="display:none; width: 100%; height: 100%;"><line x1="18" y1="6" x2="6" y2="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></line><line x1="6" y1="6" x2="18" y2="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></line></svg>
+                </div>
+                <span class="error-tooltip">Invalid marks (0-100)</span>
+              </div>
+            </div>
+
+            <!-- System Design Input -->
+            <div class="input-row" id="row-sub5">
+              <div class="subject-info">
+                <div class="subject-icon">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                </div>
+                <span class="subject-label">Sys Design</span>
+              </div>
+              <div class="field-wrapper">
+                <input type="number" class="marks-input" id="sub5" min="0" max="100" placeholder="0 - 100" required>
+                <div class="indicator-icon">
+                  <svg class="check-svg" viewBox="0 0 24 24" style="display:none; width: 100%; height: 100%;"><polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+                  <svg class="x-svg" viewBox="0 0 24 24" style="display:none; width: 100%; height: 100%;"><line x1="18" y1="6" x2="6" y2="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></line><line x1="6" y1="6" x2="18" y2="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></line></svg>
+                </div>
+                <span class="error-tooltip">Invalid marks (0-100)</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Calculate CTA -->
+          <button type="submit" class="btn-primary calculate-btn" id="submit-btn" disabled>
+            <span>Calculate Results</span>
+            <svg viewBox="0 0 24 24">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- Results Display Panel -->
+      <div class="glass-card panel-card" id="output-panel">
+        
+        <!-- State A: Awaiting calculation -->
+        <div class="result-placeholder" id="res-placeholder">
+          <svg class="placeholder-illustration" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10" stroke-dasharray="5 5"></circle>
+            <path d="M12 8v4l3 3" stroke-linecap="round"></path>
+          </svg>
+          <p class="placeholder-text">Enter the subject marks on the left to activate visual performance analytics.</p>
+        </div>
+
+        <!-- State B: Visual dashboard metrics -->
+        <div class="result-dashboard" id="res-dashboard">
+          <h3 class="panel-title">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary);"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+            Academic Metrics
+          </h3>
+          <p class="panel-subtitle">Individual subject reports and overall calculated analytics.</p>
+          
+          <div class="result-summary-grid">
+            <!-- Percent Radial Progress circle -->
+            <div class="percentage-gauge">
+              <svg>
+                <circle class="gauge-bg" cx="70" cy="70" r="60"></circle>
+                <circle class="gauge-fill" id="gauge-circle" cx="70" cy="70" r="60"></circle>
+              </svg>
+              <div class="gauge-info">
+                <div class="percentage-val" id="res-pct">0%</div>
+                <div class="percentage-lbl">Score</div>
+              </div>
+            </div>
+
+            <!-- High level stats badges -->
+            <div class="summary-badges">
+              <div class="badge-row">
+                <div class="score-badge">
+                  <span class="badge-title">Total Marks</span>
+                  <span class="badge-value" id="res-total">0 / 500</span>
+                </div>
+                <div class="score-badge">
+                  <span class="badge-title">Grade</span>
+                  <span class="badge-value grade-color" id="res-grade">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alert banner passes / fail -->
+          <div class="status-banner" id="res-status-banner">
+            <div class="status-banner-icon" id="status-icon-box"></div>
+            <div class="status-banner-text" id="res-status-desc"></div>
+          </div>
+
+          <!-- Subject breakdowns progress bars -->
+          <div class="subject-breakdown">
+            <h4 class="breakdown-title">Subject Level breakdown</h4>
+            <div class="breakdown-list">
+              
+              <!-- DBMS Row -->
+              <div class="breakdown-row">
+                <div class="breakdown-meta">
+                  <span class="breakdown-subject-name">
+                    <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>
+                    DBMS
+                  </span>
+                  <div>
+                    <span class="breakdown-marks" id="breakdown-val-1">0/100</span>
+                    <span class="breakdown-status" id="breakdown-status-1">Pass</span>
+                  </div>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" id="breakdown-bar-1"></div>
+                </div>
+              </div>
+
+              <!-- JAVA Row -->
+              <div class="breakdown-row">
+                <div class="breakdown-meta">
+                  <span class="breakdown-subject-name">
+                    <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                    JAVA
+                  </span>
+                  <div>
+                    <span class="breakdown-marks" id="breakdown-val-2">0/100</span>
+                    <span class="breakdown-status" id="breakdown-status-2">Pass</span>
+                  </div>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" id="breakdown-bar-2"></div>
+                </div>
+              </div>
+
+              <!-- Operating System Row -->
+              <div class="breakdown-row">
+                <div class="breakdown-meta">
+                  <span class="breakdown-subject-name">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
+                    Operating System
+                  </span>
+                  <div>
+                    <span class="breakdown-marks" id="breakdown-val-3">0/100</span>
+                    <span class="breakdown-status" id="breakdown-status-3">Pass</span>
+                  </div>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" id="breakdown-bar-3"></div>
+                </div>
+              </div>
+
+              <!-- Networks Row -->
+              <div class="breakdown-row">
+                <div class="breakdown-meta">
+                  <span class="breakdown-subject-name">
+                    <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                    Computer Networks
+                  </span>
+                  <div>
+                    <span class="breakdown-marks" id="breakdown-val-4">0/100</span>
+                    <span class="breakdown-status" id="breakdown-status-4">Pass</span>
+                  </div>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" id="breakdown-bar-4"></div>
+                </div>
+              </div>
+
+              <!-- System Design Row -->
+              <div class="breakdown-row">
+                <div class="breakdown-meta">
+                  <span class="breakdown-subject-name">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    System Design
+                  </span>
+                  <div>
+                    <span class="breakdown-marks" id="breakdown-val-5">0/100</span>
+                    <span class="breakdown-status" id="breakdown-status-5">Pass</span>
+                  </div>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" id="breakdown-bar-5"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Reset Workspace Evaluator -->
+          <button class="btn-secondary reset-btn" id="reset-btn" aria-label="Evaluate another score">
+            <svg viewBox="0 0 24 24">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+            <span>Evaluate Another Student</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 ResultCraft Studio. Visual metrics designed for educational performance.</p>
+  </footer>
+
+  <!-- Application Logic & Controllers -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      // ----------------------------------------------------
+      // 1. THEME SELECTION STATE PERSISTENCE
+      // ----------------------------------------------------
+      const themeToggle = document.getElementById('theme-toggle');
+      const body = document.body;
+
+      const savedTheme = localStorage.getItem('resultcraft-theme');
+      if (savedTheme === 'light') {
+        body.classList.add('light-theme');
+      } else if (savedTheme === 'dark') {
+        body.classList.remove('light-theme');
+      } else {
+        // Fallback to system preference
+        const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+        if (prefersLight) {
+          body.classList.add('light-theme');
+        }
+      }
+
+      themeToggle.addEventListener('click', () => {
+        body.classList.toggle('light-theme');
+        const theme = body.classList.contains('light-theme') ? 'light' : 'dark';
+        localStorage.setItem('resultcraft-theme', theme);
+      });
+
+      // ----------------------------------------------------
+      // 2. INPUT DOM ELEMENTS & REAL-TIME VALIDATION
+      // ----------------------------------------------------
+      const inputs = [
+        document.getElementById('sub1'),
+        document.getElementById('sub2'),
+        document.getElementById('sub3'),
+        document.getElementById('sub4'),
+        document.getElementById('sub5')
+      ];
+
+      const rows = [
+        document.getElementById('row-sub1'),
+        document.getElementById('row-sub2'),
+        document.getElementById('row-sub3'),
+        document.getElementById('row-sub4'),
+        document.getElementById('row-sub5')
+      ];
+
+      const form = document.getElementById('marks-form');
+      const submitBtn = document.getElementById('submit-btn');
+
+      const validateInput = (input, row) => {
+        const value = input.value.trim();
+        const num = parseFloat(value);
+        const checkIcon = row.querySelector('.check-svg');
+        const xIcon = row.querySelector('.x-svg');
+
+        if (value !== '' && !isNaN(num) && num >= 0 && num <= 100) {
+          row.classList.add('is-valid');
+          row.classList.remove('is-invalid');
+          checkIcon.style.display = 'block';
+          xIcon.style.display = 'none';
+          return true;
+        } else {
+          row.classList.remove('is-valid');
+          if (value !== '') {
+            row.classList.add('is-invalid');
+            checkIcon.style.display = 'none';
+            xIcon.style.display = 'block';
+          } else {
+            row.classList.remove('is-invalid');
+            checkIcon.style.display = 'none';
+            xIcon.style.display = 'none';
+          }
+          return false;
+        }
+      };
+
+      const checkFormValidity = () => {
+        let allValid = true;
+        inputs.forEach((input, index) => {
+          const isValid = validateInput(input, rows[index]);
+          if (!isValid) allValid = false;
+        });
+        submitBtn.disabled = !allValid;
+      };
+
+      inputs.forEach((input, index) => {
+        ['input', 'blur'].forEach(eventName => {
+          input.addEventListener(eventName, () => {
+            checkFormValidity();
+          });
+        });
+      });
+
+      // ----------------------------------------------------
+      // 3. RESULTS DISPLAY AND COUNT-UP CONTROLLER
+      // ----------------------------------------------------
+      const resPlaceholder = document.getElementById('res-placeholder');
+      const resDashboard = document.getElementById('res-dashboard');
+      const resPctText = document.getElementById('res-pct');
+      const resTotalText = document.getElementById('res-total');
+      const resGradeText = document.getElementById('res-grade');
+      const resStatusBanner = document.getElementById('res-status-banner');
+      const statusIconBox = document.getElementById('status-icon-box');
+      const resStatusDesc = document.getElementById('res-status-desc');
+      const gaugeCircle = document.getElementById('gauge-circle');
+
+      const successIconSVG = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+      const dangerIconSVG = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+
+      const getGrade = (percentage) => {
+        if (percentage >= 90) return { letter: 'A', color: '#10b981', glow: 'rgba(16, 185, 129, 0.4)' };
+        if (percentage >= 80) return { letter: 'B', color: '#6366f1', glow: 'rgba(99, 102, 241, 0.4)' };
+        if (percentage >= 70) return { letter: 'C', color: '#0ea5e9', glow: 'rgba(14, 165, 233, 0.4)' };
+        if (percentage >= 60) return { letter: 'D', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.4)' };
+        return { letter: 'F', color: '#f43f5e', glow: 'rgba(244, 63, 94, 0.4)' };
+      };
+
+      // Helper function for text number counting animation
+      const animateTextCount = (element, targetValue, duration = 1200, isPercent = false, totalLimit = 500) => {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          const currentValue = progress * targetValue;
+          
+          if (isPercent) {
+            element.textContent = `${currentValue.toFixed(1)}%`;
+          } else {
+            element.textContent = `${Math.floor(currentValue)} / ${totalLimit}`;
+          }
+          
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          } else {
+            if (isPercent) {
+              element.textContent = `${targetValue.toFixed(1)}%`;
+            } else {
+              element.textContent = `${targetValue} / ${totalLimit}`;
+            }
+          }
+        };
+        window.requestAnimationFrame(step);
+      };
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        let valid = true;
+        inputs.forEach((input, index) => {
+          if (!validateInput(input, rows[index])) {
+            valid = false;
+          }
+        });
+
+        if (!valid) return;
+
+        const scores = inputs.map(input => parseFloat(input.value));
+        const totalMarks = scores.reduce((sum, curr) => sum + curr, 0);
+        const percentage = parseFloat((totalMarks / 5).toFixed(1));
+        
+        const subjectPasses = scores.map(s => s >= 35);
+        const allSubjectsPassed = subjectPasses.every(pass => pass === true);
+        const hasPassedOverall = percentage >= 40 && allSubjectsPassed;
+
+        // Perform counts & circle animation
+        resPlaceholder.style.display = 'none';
+        resDashboard.style.display = 'flex';
+
+        // Animate total marks and percentage
+        animateTextCount(resTotalText, totalMarks, 1000, false);
+        animateTextCount(resPctText, percentage, 1200, true);
+
+        // Circular progress dash offset update
+        const strokeDashOffset = 377 - (377 * percentage) / 100;
+        gaugeCircle.style.strokeDashoffset = strokeDashOffset;
+
+        const gradeConfig = getGrade(percentage);
+        resGradeText.textContent = gradeConfig.letter;
+        resGradeText.style.setProperty('--grade-color', gradeConfig.color);
+        resGradeText.style.setProperty('--grade-glow', gradeConfig.glow);
+        gaugeCircle.style.stroke = gradeConfig.color;
+
+        let failReasons = [];
+        if (percentage < 40) failReasons.push("overall average below 40%");
+        scores.forEach((score, idx) => {
+          if (score < 35) {
+            const subjectNames = ["DBMS", "JAVA", "Operating System", "Computer Networks", "System Design"];
+            failReasons.push(`${subjectNames[idx]} score below 35`);
+          }
+        });
+
+        if (hasPassedOverall) {
+          resStatusBanner.className = 'status-banner status-pass';
+          statusIconBox.innerHTML = successIconSVG;
+          resStatusDesc.innerHTML = `<strong>Pass:</strong> Fantastic! The student passed all evaluation parameters with merit standing.`;
+          initiateConfetti();
+        } else {
+          resStatusBanner.className = 'status-banner status-fail';
+          statusIconBox.innerHTML = dangerIconSVG;
+          resStatusDesc.innerHTML = `<strong>Fail:</strong> Assessment criteria not met. Details: ${failReasons.join(" & ")}.`;
+        }
+
+        scores.forEach((score, idx) => {
+          const barFill = document.getElementById(`breakdown-bar-${idx + 1}`);
+          const scoreText = document.getElementById(`breakdown-val-${idx + 1}`);
+          const statusSpan = document.getElementById(`breakdown-status-${idx + 1}`);
+          
+          scoreText.textContent = `${score}/100`;
+          
+          setTimeout(() => {
+            barFill.style.width = `${score}%`;
+            if (score < 35) {
+              barFill.style.background = 'var(--danger-grad)';
+              statusSpan.textContent = 'Fail';
+              statusSpan.className = 'breakdown-status fail';
+            } else if (score >= 80) {
+              barFill.style.background = 'var(--success-grad)';
+              statusSpan.textContent = 'Pass';
+              statusSpan.className = 'breakdown-status pass';
+            } else {
+              barFill.style.background = 'var(--primary-grad)';
+              statusSpan.textContent = 'Pass';
+              statusSpan.className = 'breakdown-status pass';
+            }
+          }, 50 * idx);
+        });
+
+        // Scroll layout on small viewports
+        if (window.innerWidth <= 992) {
+          resDashboard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+
+      // Reset application details
+      const resetBtn = document.getElementById('reset-btn');
+      resetBtn.addEventListener('click', () => {
+        form.reset();
+        rows.forEach(row => {
+          row.classList.remove('is-valid', 'is-invalid');
+          row.querySelector('.check-svg').style.display = 'none';
+          row.querySelector('.x-svg').style.display = 'none';
+        });
+
+        submitBtn.disabled = true;
+
+        for (let idx = 0; idx < 5; idx++) {
+          document.getElementById(`breakdown-bar-${idx + 1}`).style.width = '0%';
+        }
+        
+        gaugeCircle.style.strokeDashoffset = '377';
+        resDashboard.style.display = 'none';
+        resPlaceholder.style.display = 'flex';
+        stopConfetti();
+      });
+
+      // Smooth scroll anchors configuration
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      });
+
+      // ----------------------------------------------------
+      // 4. CONFETTI Canvas System
+      // ----------------------------------------------------
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      let animationId = null;
+      let particles = [];
+      const colors = ['#8b5cf6', '#6366f1', '#10b981', '#0ea5e9', '#f59e0b', '#ec4899', '#f43f5e'];
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      class ConfettiParticle {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * -canvas.height - 20;
+          this.size = Math.random() * 8 + 6;
+          this.color = colors[Math.floor(Math.random() * colors.length)];
+          this.speedY = Math.random() * 4 + 4;
+          this.speedX = Math.random() * 4 - 2;
+          this.rotation = Math.random() * 360;
+          this.rotationSpeed = Math.random() * 4 - 2;
+        }
+
+        update() {
+          this.y += this.speedY;
+          this.x += this.speedX;
+          this.rotation += this.rotationSpeed;
+        }
+
+        draw() {
+          ctx.save();
+          ctx.translate(this.x + this.size / 2, this.y + this.size / 2);
+          ctx.rotate((this.rotation * Math.PI) / 180);
+          ctx.fillStyle = this.color;
+          ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+          ctx.restore();
+        }
+      }
+
+      function animateConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p, idx) => {
+          p.update();
+          p.draw();
+          if (p.y > canvas.height) {
+            particles[idx] = new ConfettiParticle();
+            particles[idx].y = -20;
+          }
+        });
+        animationId = requestAnimationFrame(animateConfetti);
+      }
+
+      function initiateConfetti() {
+        stopConfetti();
+        particles = [];
+        const count = Math.min(100, Math.floor(window.innerWidth / 10));
+        for (let i = 0; i < count; i++) {
+          particles.push(new ConfettiParticle());
+        }
+        animateConfetti();
+        
+        setTimeout(() => {
+          stopConfettiGracefully();
+        }, 4000);
+      }
+
+      function stopConfetti() {
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+          animationId = null;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles = [];
+      }
+
+      function stopConfettiGracefully() {
+        let fadeTimer = setInterval(() => {
+          if (particles.length > 0) {
+            particles.splice(0, 8);
+          } else {
+            clearInterval(fadeTimer);
+            stopConfetti();
+          }
+        }, 100);
+      }
+
+    });
+  </script>
+</body>
+</html>
