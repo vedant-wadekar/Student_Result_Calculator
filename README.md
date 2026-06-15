@@ -1,5 +1,10 @@
 # Student Result Calculator
 
+Website : https://vedant-wadekar.github.io/Student_Result_Calculator
+
+<img width="1344" height="574" alt="image" src="https://github.com/user-attachments/assets/d5d4af32-6fad-466f-bbf9-050491b36f76" />
+
+
 A responsive web application developed using HTML, CSS, and JavaScript with AI assistance from Claude.
 
 ## Features
