@@ -1,1 +1,29 @@
-# Student_Result_Calculator
+# Student Result Calculator
+
+A responsive web application developed using HTML, CSS, and JavaScript with AI assistance from Claude.
+
+## Features
+- Enter marks for 5 subjects
+- Calculate total marks
+- Calculate percentage
+- Generate grade (A, B, C, D, F)
+- Display pass/fail status
+- Input validation (0–100)
+- Responsive user interface
+- Dark/Light theme support
+- Interactive charts and animations
+
+## Technologies Used
+- HTML5
+- CSS3
+- JavaScript
+- GitHub Pages
+
+## AI Assistance
+Claude AI was used to generate and improve the application code, styling, validation logic, and user interface.
+
+## Live Demo
+Add your GitHub Pages link here after deployment.
+
+## Author
+Vedant Wadekar
