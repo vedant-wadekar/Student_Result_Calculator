@@ -27,8 +27,5 @@ A responsive web application developed using HTML, CSS, and JavaScript with AI a
 ## AI Assistance
 Claude AI was used to generate and improve the application code, styling, validation logic, and user interface.
 
-## Live Demo
-Add your GitHub Pages link here after deployment.
-
 ## Author
 Vedant Wadekar
